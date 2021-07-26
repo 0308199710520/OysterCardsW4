@@ -16,28 +16,21 @@ describe OysterCard do
       expect { oystercard.top_up(91) }.to raise_error("Balance cannot exceed #{OysterCard::LIMIT}!")
     end
   end
-  # deduct is now a private method
-  # describe "#deduct" do 
-  #   it "deducts the cost of the ticket" do
-  #     oystercard.top_up(10)
-  #     expect(oystercard.deduct(5)).to(eq(5))
-  #   end
-  # end
   describe "#touch_in" do
     it "changes value of in_journey to true" do
       oystercard.top_up(5)
-      oystercard.touch_in
-      expect(oystercard.in_journey).to eq(true)
+      oystercard.touch_in("Oxford Road")
+      expect(oystercard.in_journey?).to eq(true)
     end
-    it "raises an error if balance is below 1" do
-      expect { oystercard.touch_in }.to raise_error("Balance below #{OysterCard::MINIMUM}!")
+    it "raises an error if balance is below #{OysterCard::MINIMUM}" do
+      expect { oystercard.touch_in("Oxford Road") }.to raise_error("Balance below #{OysterCard::MINIMUM}!")
     end
   end
   describe "#touch_out" do
     it "changes value of in_journey to false" do
       oystercard.top_up(1)
       oystercard.touch_out
-      expect(oystercard.in_journey).to eq(false)
+      expect(oystercard.in_journey?).to eq(false)
     end
     it "deducts the minimum fare from balace" do
       oystercard.top_up(1)
@@ -47,10 +40,11 @@ describe OysterCard do
   end
   describe "#in_journey?" do
     it "states whether it's in a journey" do
-      oystercard.top_up(5)
-      oystercard.touch_in
+      # station_dbl = double("Station", :station => "Oxford Road")
+      # oystercard = OysterCard.new(station: station_dbl, in_journey: true)
+      oystercard = OysterCard.new(balance: 5)
+      oystercard.touch_in("Oxford Road")
       expect(oystercard.in_journey?).to eq(true)
     end
   end
-
 end
