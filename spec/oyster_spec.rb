@@ -38,11 +38,26 @@ describe OysterCard do
       expect { oystercard.touch_out("Afganistan") }.to change{ oystercard.balance }.by(-OysterCard::MINIMUM)
       
     end
-    it "records the entry and exit stations and returns them on demand" do
+    it "records 1 set of entry and exit stations and returns them on demand" do
       oystercard.top_up(50)
       oystercard.touch_in("Oxford Road")
       oystercard.touch_out("Piccadilly")
       expect(oystercard.journeys).to eq([{entry: "Oxford Road", exit: "Piccadilly"}])
+    end
+    it "records several sets of entry and exit stations and returns them on demand" do
+      oystercard.top_up(50)
+      3.times {
+      oystercard.touch_in("Oxford Road")
+      oystercard.touch_out("Piccadilly")
+              }
+      oystercard.touch_in("Piccadilly")
+      oystercard.touch_out("Oxford Road")
+      expect(oystercard.journeys).to eq([
+        {entry: "Oxford Road", exit: "Piccadilly"}, 
+        {entry: "Oxford Road", exit: "Piccadilly"}, 
+        {entry: "Oxford Road", exit: "Piccadilly"}, 
+        {entry: "Piccadilly", exit: "Oxford Road"}
+        ])
     end
   end
   describe "#in_journey?" do
@@ -50,6 +65,11 @@ describe OysterCard do
       oystercard = OysterCard.new(balance: 5)
       oystercard.touch_in("Oxford Road")
       expect(oystercard.in_journey?).to eq(true)
+    end
+  end
+  describe "#journeys" do
+    it "returns an empty list when it is initially called" do
+      expect(oystercard.journeys).to(eq([]))
     end
   end
 end
