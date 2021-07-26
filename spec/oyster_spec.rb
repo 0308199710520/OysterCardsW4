@@ -26,22 +26,27 @@ describe OysterCard do
       expect { oystercard.touch_in("Oxford Road") }.to raise_error("Balance below #{OysterCard::MINIMUM}!")
     end
   end
+
   describe "#touch_out" do
     it "changes value of in_journey to false" do
-      oystercard.top_up(1)
-      oystercard.touch_out
+      oystercard = OysterCard.new(balance: 5)
+      oystercard.touch_out("piccadilly")
       expect(oystercard.in_journey?).to eq(false)
     end
     it "deducts the minimum fare from balace" do
       oystercard.top_up(1)
-      expect { oystercard.touch_out }.to change{ oystercard.balance }.by(-OysterCard::MINIMUM)
+      expect { oystercard.touch_out("Afganistan") }.to change{ oystercard.balance }.by(-OysterCard::MINIMUM)
       
+    end
+    it "records the entry and exit stations and returns them on demand" do
+      oystercard.top_up(50)
+      oystercard.touch_in("Oxford Road")
+      oystercard.touch_out("Piccadilly")
+      expect(oystercard.journeys).to eq([{entry: "Oxford Road", exit: "Piccadilly"}])
     end
   end
   describe "#in_journey?" do
     it "states whether it's in a journey" do
-      # station_dbl = double("Station", :station => "Oxford Road")
-      # oystercard = OysterCard.new(station: station_dbl, in_journey: true)
       oystercard = OysterCard.new(balance: 5)
       oystercard.touch_in("Oxford Road")
       expect(oystercard.in_journey?).to eq(true)

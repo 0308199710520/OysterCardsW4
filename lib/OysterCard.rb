@@ -5,10 +5,13 @@ class OysterCard
   LIMIT = 90
   MINIMUM = 1
 
-  def initialize(balance: 0, station: Station.new, in_journey: nil)
+  attr_reader :journeys
+
+  def initialize(balance: 0, station: Station.new, in_journey: nil, journeys: Array.new)
     @balance = balance
     @in_journey = in_journey
     @station = station
+    @journeys = journeys
   end
 
   def balance
@@ -26,8 +29,9 @@ class OysterCard
     @in_journey = true
   end
 
-  def touch_out
+  def touch_out(exit)
     deduct(MINIMUM)
+    @journeys.append({entry: @station.station, exit: exit})
     @in_journey = false
   end
 

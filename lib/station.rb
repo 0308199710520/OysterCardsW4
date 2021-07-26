@@ -13,6 +13,6 @@ class Station
   end
 
   def station
-    return station
+    return @station
   end
 end
