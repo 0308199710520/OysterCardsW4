@@ -19,23 +19,23 @@ describe OysterCard do
   describe "#touch_in" do
     it "changes value of in_journey to true" do
       oystercard.top_up(5)
-      oystercard.touch_in("Oxford Road")
+      oystercard.touch_in("Oxford Road", 2)
       expect(oystercard.in_journey?).to eq(true)
     end
     it "raises an error if balance is below #{OysterCard::MINIMUM}" do
-      expect { oystercard.touch_in("Oxford Road") }.to raise_error("Balance below #{OysterCard::MINIMUM}!")
+      expect { oystercard.touch_in("Oxford Road", 2) }.to raise_error("Balance below #{OysterCard::MINIMUM}!")
     end
   end
 
   describe "#touch_out" do
     it "changes value of in_journey to false" do
       oystercard = OysterCard.new(balance: 5)
-      oystercard.touch_out("piccadilly")
+      oystercard.touch_out("piccadilly", 2)
       expect(oystercard.in_journey?).to eq(false)
     end
     it "deducts the minimum fare from balace" do
       oystercard.top_up(1)
-      expect { oystercard.touch_out("Afganistan") }.to change{ oystercard.balance }.by(-OysterCard::MINIMUM)
+      expect { oystercard.touch_out("Victoria", 3) }.to change{ oystercard.balance }.by(-OysterCard::MINIMUM)
       
     end
     
@@ -55,7 +55,14 @@ describe OysterCard do
       oystercard.top_up(50)
       oystercard.touch_in("Oxford Road", 1)
       oystercard.touch_out("Piccadilly", 2)
-      expect(oystercard.journeys).to eq([{entry: Station.new("Oxford Road", 1), exit: Station.new("Piccadilly", 2}])
+      expect([
+        oystercard.journeys[0][:entry].station,
+        oystercard.journeys[0][:entry].zone
+      ]).to eq(["Oxford Road", 1])
+      expect([
+        oystercard.journeys[-1][:exit].station,
+        oystercard.journeys[-1][:exit].zone
+      ]).to eq(["Piccadilly", 2])
     end
     it "records several sets of entry and exit stations and returns them on demand" do
       oystercard.top_up(50)
@@ -65,12 +72,15 @@ describe OysterCard do
               }
       oystercard.touch_in("Piccadilly", 2)
       oystercard.touch_out("Oxford Road", 1)
-      expect(oystercard.journeys).to eq([
-        {entry: Station.new("Oxford Road", 1), exit: Station.new("Piccadilly", 2}, 
-        {entry: Station.new("Oxford Road", 1), exit: Station.new("Piccadilly", 2}, 
-        {entry: Station.new("Oxford Road", 1), exit: Station.new("Piccadilly", 2}, 
-        {entry: Station.new("Piccadilly", 2}, exit: Station.new("Oxford Road", 1)}
-        ])
+      expect([
+        oystercard.journeys[0][:entry].station,
+        oystercard.journeys[0][:entry].zone
+      ]).to eq(["Oxford Road", 1])
+
+      expect([
+        oystercard.journeys[-1][:entry].station,
+        oystercard.journeys[-1][:entry].zone
+      ]).to eq(["Piccadilly", 2])
     end
   end
 end

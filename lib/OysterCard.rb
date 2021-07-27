@@ -7,10 +7,10 @@ class OysterCard
 
   attr_reader :journeys
 
-  def initialize(balance: 0, station: Station.new, in_journey: nil, journeys: Array.new)
+  def initialize(balance: 0, in_journey: nil, journeys: Array.new)
     @balance = balance
     @in_journey = in_journey
-    @station = station
+    @station = nil
     @journeys = journeys
   end
 
@@ -23,15 +23,15 @@ class OysterCard
     @balance += amount
   end
 
-  def touch_in(station)
+  def touch_in(station, zone)
     fail "Balance below #{MINIMUM}!" if minimumBalance?
-    @station.in(station)
+    @station = Station.new(station, zone)
     @in_journey = true
   end
 
-  def touch_out(exit)
+  def touch_out(station, zone)
     deduct(MINIMUM)
-    @journeys.append({entry: @station.station, exit: exit})
+    @journeys.append({entry: @station, exit: Station.new(station, zone)})
     @in_journey = false
   end
 
