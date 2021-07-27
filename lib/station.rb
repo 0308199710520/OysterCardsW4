@@ -1,18 +1,16 @@
 class Station
 
-  def initialize
-    @station = nil
-  end
-
-  def in(station)
+  def initialize(station, zone)
     @station = station
+    @zone = zone
   end
-
-  def out
-    @station = nil
-  end
+  
 
   def station
     return @station
+  end
+
+  def zone
+    return @zone
   end
 end
